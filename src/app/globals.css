@@ -1,0 +1,540 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ANUBIS ALPHA - RETRO TERMINAL THEME
+   Complete Styling System
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CSS VARIABLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Background colors */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #0d0d0d;
+  --bg-tertiary: #111111;
+  --bg-elevated: #1a1a1a;
+  
+  /* Text colors */
+  --text-primary: #e8e8e8;
+  --text-secondary: #888888;
+  --text-muted: #555555;
+  --text-dim: #333333;
+  
+  /* Accent colors */
+  --color-gold: #ffd700;
+  --color-purple: #9400d3;
+  --color-blue: #4169e1;
+  --color-pink: #ff69b4;
+  --color-green: #32cd32;
+  --color-red: #dc143c;
+  --color-cyan: #20b2aa;
+  
+  /* Sefirot colors */
+  --sefirah-keter: #ffffff;
+  --sefirah-chokmah: #87ceeb;
+  --sefirah-binah: #4169e1;
+  --sefirah-daat: #9400d3;
+  --sefirah-chesed: #32cd32;
+  --sefirah-gevurah: #dc143c;
+  --sefirah-tiferet: #ffd700;
+  --sefirah-netzach: #ff69b4;
+  --sefirah-hod: #9370db;
+  --sefirah-yesod: #20b2aa;
+  --sefirah-malkuth: #8b4513;
+  
+  /* Typography */
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BASE STYLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 14px;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCROLLBAR STYLING
+   ───────────────────────────────────────────────────────────────────────────── */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #333 #0a0a0a;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CRT EFFECTS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Scanline overlay */
+.crt-scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.3) 2px,
+    rgba(0, 0, 0, 0.3) 4px
+  );
+  opacity: 0.05;
+}
+
+/* CRT glow */
+.crt-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.7);
+}
+
+/* Vignette */
+.crt-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9997;
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ANIMATIONS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px currentColor;
+    opacity: 0.8;
+  }
+  50% {
+    box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+    opacity: 1;
+  }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
+  75% { opacity: 0.98; }
+}
+
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes stage-enter {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glyph-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--color-purple);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--color-purple), 0 0 40px var(--color-purple);
+    transform: scale(1.05);
+  }
+}
+
+/* Animation Classes */
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-flicker {
+  animation: flicker 0.1s infinite;
+}
+
+.animate-stage-enter {
+  animation: stage-enter 0.3s ease-out;
+}
+
+.animate-glyph {
+  animation: glyph-pulse 1.5s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TEXT EFFECTS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.text-glow {
+  text-shadow: 0 0 10px currentColor;
+}
+
+.text-glow-strong {
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+}
+
+/* Terminal cursor */
+.cursor-terminal::after {
+  content: '█';
+  animation: blink 1s step-end infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SELECTION STYLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+::selection {
+  background: var(--color-purple);
+  color: white;
+}
+
+::-moz-selection {
+  background: var(--color-purple);
+  color: white;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   FOCUS STYLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 1px solid var(--color-purple);
+  outline-offset: 2px;
+}
+
+input:focus {
+  box-shadow: 0 0 0 1px var(--color-purple);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BUTTON STYLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  user-select: none;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--color-purple);
+  color: white;
+  border: 1px solid transparent;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #7b00b3;
+  box-shadow: 0 2px 10px rgba(148, 0, 211, 0.3);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid #333;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: #555;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   INPUT STYLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.input {
+  width: 100%;
+  padding: 0.5rem;
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 0.25rem;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: inherit;
+  transition: border-color var(--transition-fast);
+}
+
+.input::placeholder {
+  color: var(--text-dim);
+}
+
+.input:hover {
+  border-color: #444;
+}
+
+.input:focus {
+  border-color: var(--color-purple);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CARD/PANEL STYLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.panel {
+  background: var(--bg-secondary);
+  border: 1px solid #222;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #222;
+  background: var(--bg-tertiary);
+}
+
+.panel-body {
+  padding: 1rem;
+}
+
+.panel-footer {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #222;
+  background: var(--bg-tertiary);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MESSAGE BUBBLE STYLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.message-bubble {
+  max-width: 85%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid;
+  transition: all var(--transition-normal);
+}
+
+.message-bubble-user {
+  background: rgba(65, 105, 225, 0.1);
+  border-color: rgba(65, 105, 225, 0.3);
+}
+
+.message-bubble-assistant {
+  background: var(--bg-tertiary);
+  border-color: rgba(148, 0, 211, 0.3);
+}
+
+.message-bubble:hover {
+  border-color: #444;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SEFIROT NODE STYLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.sefirot-node {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5rem;
+  transition: all var(--transition-normal);
+}
+
+.sefirot-node-pending {
+  border-color: #333;
+  color: #333;
+  background: transparent;
+}
+
+.sefirot-node-active {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.sefirot-node-completed {
+  border-color: currentColor;
+  background: transparent;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   STAT BAR STYLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.stat-bar {
+  height: 0.5rem;
+  background: #1a1a1a;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  border: 1px solid #333;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  transition: width var(--transition-slow);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   THINKING STREAM STYLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.thinking-stage {
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid;
+  transition: all var(--transition-normal);
+}
+
+.thinking-stage-pending {
+  border-color: #222;
+  background: transparent;
+}
+
+.thinking-stage-active {
+  border-color: var(--color-gold);
+  background: rgba(255, 215, 0, 0.05);
+}
+
+.thinking-stage-completed {
+  border-color: #333;
+  background: var(--bg-tertiary);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   GLYPH (THIRD EYE) STYLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.glyph-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.glyph-active {
+  color: var(--color-purple);
+  text-shadow: 0 0 10px var(--color-purple), 0 0 20px var(--color-purple);
+  animation: glyph-pulse 1.5s ease-in-out infinite;
+}
+
+.glyph-inactive {
+  color: #333;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MEMORY TIER STYLES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.memory-river {
+  border-color: #20b2aa;
+  background: rgba(32, 178, 170, 0.1);
+}
+
+.memory-library {
+  border-color: #4169e1;
+  background: rgba(65, 105, 225, 0.1);
+}
+
+.memory-golden {
+  border-color: #ffd700;
+  background: rgba(255, 215, 0, 0.1);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   UTILITY CLASSES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.border-glow {
+  box-shadow: 0 0 10px currentColor;
+}
+
+.transition-all-fast {
+  transition: all var(--transition-fast);
+}
+
+.transition-all-normal {
+  transition: all var(--transition-normal);
+}
+
+.transition-all-slow {
+  transition: all var(--transition-slow);
+}
