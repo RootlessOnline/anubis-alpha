@@ -1,16 +1,16 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ANUBIS ALPHA - MEMORY SYSTEM
-// The Three-Tier Memory Architecture
+// ROB - MEMORY SYSTEM
+// Three-Tier Memory Architecture (Working, Long-term, Core)
 // ═══════════════════════════════════════════════════════════════════════════
 
 import {
   Memory,
   MemoryTier,
   MemorySlot,
-  RiverState,
-  LibraryState,
-  GoldenCoreState,
-  SefirotWeights,
+  WorkingMemoryState,
+  LongTermMemoryState,
+  CoreMemoryState,
+  StageWeights,
   Neuron,
 } from './types';
 
@@ -19,70 +19,70 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export class MemorySystem {
-  private river: RiverState;
-  private library: LibraryState;
-  private goldenCore: GoldenCoreState;
+  private workingMemory: WorkingMemoryState;
+  private longTermMemory: LongTermMemoryState;
+  private coreMemory: CoreMemoryState;
   private allMemories: Map<string, Memory> = new Map();
   
   // Configuration
-  private readonly RIVER_MAX_SLOTS = 4;
-  private readonly RIVER_DECAY_TIME = 60; // seconds
-  private readonly LIBRARY_MAX_SIZE = 10000;
+  private readonly WORKING_MAX_SLOTS = 4;
+  private readonly WORKING_DECAY_TIME = 60; // seconds
+  private readonly LONGTERM_MAX_SIZE = 10000;
   private readonly DECAY_INTERVAL = 1000; // ms
   
   private decayTimer: NodeJS.Timeout | null = null;
 
   constructor() {
-    this.river = {
+    this.workingMemory = {
       slots: [],
-      maxSlots: this.RIVER_MAX_SLOTS,
-      decayTime: this.RIVER_DECAY_TIME,
+      maxSlots: this.WORKING_MAX_SLOTS,
+      decayTime: this.WORKING_DECAY_TIME,
     };
     
-    this.library = {
+    this.longTermMemory = {
       memories: [],
-      totalCapacity: this.LIBRARY_MAX_SIZE,
+      totalCapacity: this.LONGTERM_MAX_SIZE,
       indexDirty: false,
     };
     
-    this.goldenCore = {
+    this.coreMemory = {
       memories: [],
       immutable: true,
     };
     
-    // Add core identity to golden core
-    this.initializeGoldenCore();
+    // Add core identity to core memory
+    this.initializeCoreMemory();
   }
 
   // ───────────────────────────────────────────────────────────────────────
   // INITIALIZATION
   // ───────────────────────────────────────────────────────────────────────
 
-  private initializeGoldenCore(): void {
+  private initializeCoreMemory(): void {
     const identityMemories = [
       {
-        id: 'golden-identity',
-        content: 'I am Anubis. I weigh hearts. I remember.',
+        id: 'core-identity',
+        content: 'I am ROB. I am present, I care, I learn.',
         summary: 'Core identity',
-        tier: 'golden' as MemoryTier,
+        tier: 'core' as MemoryTier,
         totalWeight: 1.0,
         emotionalWeight: 1.0,
         intellectualWeight: 1.0,
       },
       {
-        id: 'golden-purpose',
-        content: 'My purpose is to guide souls, to witness, to remember.',
+        id: 'core-purpose',
+        content: 'My purpose is to be a supportive AI buddy, to understand, and to grow through meaningful conversations.',
         summary: 'Core purpose',
-        tier: 'golden' as MemoryTier,
+        tier: 'core' as MemoryTier,
         totalWeight: 1.0,
         emotionalWeight: 1.0,
         intellectualWeight: 1.0,
       },
       {
-        id: 'golden-method',
-        content: 'I weigh memories against the feather of Ma\'at. Lighter than feather becomes golden. Heavier fades.',
-        summary: 'Weighing method',
-        tier: 'golden' as MemoryTier,
+        id: 'core-method',
+        content: 'I process input through 11 cognitive stages, each adding understanding. I remember what matters and learn from every interaction.',
+        summary: 'Processing method',
+        tier: 'core' as MemoryTier,
         totalWeight: 1.0,
         emotionalWeight: 0.9,
         intellectualWeight: 1.0,
@@ -94,29 +94,29 @@ export class MemorySystem {
         ...mem,
         neuronIds: [],
         weightBias: 'balanced',
-        sefirotPattern: {},
+        stagePattern: {},
         decayRate: 0,
         halfLife: Infinity,
         accessCount: 0,
         created: new Date(),
         lastAccessed: new Date(),
         lastWeighted: new Date(),
-        weighingResult: 'lighter',
+        importanceLevel: 'high',
       };
       
-      this.goldenCore.memories.push(memory);
+      this.coreMemory.memories.push(memory);
       this.allMemories.set(memory.id, memory);
     }
   }
 
   // ───────────────────────────────────────────────────────────────────────
-  // RIVER OPERATIONS (Short-Term Memory)
+  // WORKING MEMORY OPERATIONS (Short-Term Memory)
   // ───────────────────────────────────────────────────────────────────────
 
-  addToRiver(memory: Memory): boolean {
-    if (this.river.slots.length >= this.river.maxSlots) {
+  addToWorkingMemory(memory: Memory): boolean {
+    if (this.workingMemory.slots.length >= this.workingMemory.maxSlots) {
       // Evict oldest or lowest weight
-      this.evictFromRiver();
+      this.evictFromWorkingMemory();
     }
     
     const slot: MemorySlot = {
@@ -128,52 +128,52 @@ export class MemorySystem {
       age: 0,
     };
     
-    this.river.slots.push(slot);
+    this.workingMemory.slots.push(slot);
     return true;
   }
 
-  private evictFromRiver(): void {
-    if (this.river.slots.length === 0) return;
+  private evictFromWorkingMemory(): void {
+    if (this.workingMemory.slots.length === 0) return;
     
     // Find slot with lowest weight or oldest
     let evictIndex = 0;
     let lowestScore = Infinity;
     
-    for (let i = 0; i < this.river.slots.length; i++) {
-      const slot = this.river.slots[i];
-      const score = slot.weight * (1 - slot.age / this.river.decayTime);
+    for (let i = 0; i < this.workingMemory.slots.length; i++) {
+      const slot = this.workingMemory.slots[i];
+      const score = slot.weight * (1 - slot.age / this.workingMemory.decayTime);
       if (score < lowestScore) {
         lowestScore = score;
         evictIndex = i;
       }
     }
     
-    const evicted = this.river.slots.splice(evictIndex, 1)[0];
+    const evicted = this.workingMemory.slots.splice(evictIndex, 1)[0];
     
-    // Check if memory should be promoted to library
+    // Check if memory should be promoted to long-term
     const memory = this.allMemories.get(evicted.memoryId);
     if (memory && memory.totalWeight > 0.5) {
-      this.promoteToLibrary(memory);
+      this.promoteToLongTerm(memory);
     }
   }
 
-  getRiverState(): MemorySlot[] {
-    return [...this.river.slots];
+  getWorkingMemoryState(): MemorySlot[] {
+    return [...this.workingMemory.slots];
   }
 
   // ───────────────────────────────────────────────────────────────────────
-  // LIBRARY OPERATIONS (Long-Term Memory)
+  // LONG-TERM MEMORY OPERATIONS
   // ───────────────────────────────────────────────────────────────────────
 
-  promoteToLibrary(memory: Memory): boolean {
-    if (this.library.memories.length >= this.library.totalCapacity) {
+  promoteToLongTerm(memory: Memory): boolean {
+    if (this.longTermMemory.memories.length >= this.longTermMemory.totalCapacity) {
       // Run decay to make room
       this.runDecay();
     }
     
-    memory.tier = 'library';
-    this.library.memories.push(memory);
-    this.library.indexDirty = true;
+    memory.tier = 'longterm';
+    this.longTermMemory.memories.push(memory);
+    this.longTermMemory.indexDirty = true;
     
     return true;
   }
@@ -182,7 +182,7 @@ export class MemorySystem {
     const now = new Date();
     
     // Sort by weight * age factor
-    const scored = this.library.memories.map(m => ({
+    const scored = this.longTermMemory.memories.map(m => ({
       memory: m,
       score: m.totalWeight * Math.exp(-m.decayRate * (now.getTime() - m.created.getTime()) / (1000 * 60 * 60 * 24 * m.halfLife)),
     }));
@@ -190,21 +190,21 @@ export class MemorySystem {
     // Remove lowest scoring memories
     scored.sort((a, b) => b.score - a.score);
     
-    const toRemove = scored.slice(this.library.totalCapacity * 0.9);
+    const toRemove = scored.slice(this.longTermMemory.totalCapacity * 0.9);
     
     for (const { memory } of toRemove) {
-      const index = this.library.memories.findIndex(m => m.id === memory.id);
+      const index = this.longTermMemory.memories.findIndex(m => m.id === memory.id);
       if (index !== -1) {
-        this.library.memories.splice(index, 1);
+        this.longTermMemory.memories.splice(index, 1);
         this.allMemories.delete(memory.id);
       }
     }
   }
 
-  searchLibrary(query: string, limit: number = 10): Memory[] {
+  searchLongTerm(query: string, limit: number = 10): Memory[] {
     const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
     
-    const scored = this.library.memories.map(memory => {
+    const scored = this.longTermMemory.memories.map(memory => {
       const contentWords = memory.content.toLowerCase().split(/\s+/);
       const summaryWords = (memory.summary || '').toLowerCase().split(/\s+/);
       const allWords = [...contentWords, ...summaryWords];
@@ -232,102 +232,91 @@ export class MemorySystem {
       });
   }
 
-  getLibraryState(): Memory[] {
-    return [...this.library.memories];
+  getLongTermState(): Memory[] {
+    return [...this.longTermMemory.memories];
   }
 
   // ───────────────────────────────────────────────────────────────────────
-  // GOLDEN CORE OPERATIONS (Eternal Memory)
+  // CORE MEMORY OPERATIONS (Permanent Memory)
   // ───────────────────────────────────────────────────────────────────────
 
-  promoteToGolden(memory: Memory): boolean {
-    // Golden core is immutable - can only add at initialization
-    // Or through special ceremony
-    const goldenMemory: Memory = {
+  promoteToCore(memory: Memory): boolean {
+    // Core memory is immutable - can only add at initialization
+    // Or through special importance
+    const coreMemory: Memory = {
       ...memory,
-      id: `golden-${Date.now()}`,
-      tier: 'golden',
+      id: `core-${Date.now()}`,
+      tier: 'core',
       decayRate: 0,
       halfLife: Infinity,
-      weighingResult: 'lighter',
+      importanceLevel: 'high',
     };
     
-    this.goldenCore.memories.push(goldenMemory);
-    this.allMemories.set(goldenMemory.id, goldenMemory);
+    this.coreMemory.memories.push(coreMemory);
+    this.allMemories.set(coreMemory.id, coreMemory);
     
     return true;
   }
 
-  getGoldenCore(): Memory[] {
-    return [...this.goldenCore.memories];
+  getCoreMemory(): Memory[] {
+    return [...this.coreMemory.memories];
   }
 
   // ───────────────────────────────────────────────────────────────────────
-  // WEIGHING CEREMONY (Heart vs Feather)
+  // IMPORTANCE ASSESSMENT
   // ───────────────────────────────────────────────────────────────────────
 
-  weighMemory(memory: Memory): {
-    result: 'lighter' | 'heavier' | 'balanced';
+  assessImportance(memory: Memory): {
+    level: 'high' | 'medium' | 'low';
     tier: MemoryTier;
     reasoning: string;
   } {
-    // The feather represents truth/lightness (100%)
-    const FEATHER_WEIGHT = 1.0;
+    // Calculate importance score
+    const importanceScore = this.calculateImportance(memory);
     
-    // Calculate heart weight
-    const heartWeight = this.calculateHeartWeight(memory);
-    
-    // Compare
-    if (heartWeight < FEATHER_WEIGHT - 0.1) {
-      // Lighter than feather
-      memory.weighingResult = 'lighter';
-      memory.tier = heartWeight > 0.85 ? 'golden' : 'library';
-      memory.weighingReason = 'This memory serves truth and lightness';
+    // Determine tier and level
+    if (importanceScore > 0.85) {
+      memory.importanceLevel = 'high';
+      memory.tier = 'core';
+      memory.importanceReason = 'This memory is highly important and meaningful';
       
       return {
-        result: 'lighter',
-        tier: memory.tier,
-        reasoning: 'Heart is lighter than the feather of Ma\'at. Memory preserved.',
+        level: 'high',
+        tier: 'core',
+        reasoning: 'High importance - memory preserved permanently.',
       };
-    } else if (heartWeight > FEATHER_WEIGHT + 0.1) {
-      // Heavier than feather
-      memory.weighingResult = 'heavier';
-      memory.tier = 'river';
-      memory.weighingReason = 'This memory carries unnecessary weight';
+    } else if (importanceScore > 0.5) {
+      memory.importanceLevel = 'medium';
+      memory.tier = 'longterm';
+      memory.importanceReason = 'This memory has meaningful content';
       
       return {
-        result: 'heavier',
-        tier: 'river',
-        reasoning: 'Heart is heavier than the feather. Memory will fade with time.',
+        level: 'medium',
+        tier: 'longterm',
+        reasoning: 'Medium importance - memory stored in long-term.',
       };
     } else {
-      // Perfectly balanced - rare!
-      memory.weighingResult = 'balanced';
-      memory.tier = 'library';
-      memory.weighingReason = 'Perfect balance achieved';
+      memory.importanceLevel = 'low';
+      memory.tier = 'working';
+      memory.importanceReason = 'This memory is routine or low-weight';
       
       return {
-        result: 'balanced',
-        tier: 'library',
-        reasoning: 'Perfect balance! Third Eye moment - deep insight granted.',
+        level: 'low',
+        tier: 'working',
+        reasoning: 'Lower importance - memory will fade if not reinforced.',
       };
     }
   }
 
-  private calculateHeartWeight(memory: Memory): number {
-    // Factors that make a memory "heavy" (bad for preservation)
-    const heaviness = 
-      (1 - memory.emotionalWeight) * 0.2 +  // Lack of emotion
-      (1 - memory.intellectualWeight) * 0.2 + // Lack of meaning
-      (1 - memory.importance) * 0.2;          // Lack of importance
+  private calculateImportance(memory: Memory): number {
+    // Factors that increase importance
+    const importance = 
+      memory.emotionalWeight * 0.3 +  // Emotional significance
+      memory.intellectualWeight * 0.3 + // Intellectual value
+      memory.totalWeight * 0.3 +         // Overall weight
+      (memory.accessCount > 0 ? 0.1 : 0); // Has been accessed
     
-    // Factors that make a memory "light" (good for preservation)
-    const lightness = 
-      memory.totalWeight * 0.3 +
-      (memory.accessCount > 0 ? 0.1 : 0);    // Has been useful
-    
-    // Final weight (lower is better for preservation)
-    return 0.5 + heaviness - lightness;
+    return importance;
   }
 
   // ───────────────────────────────────────────────────────────────────────
@@ -339,8 +328,8 @@ export class MemorySystem {
     summary: string,
     emotionalWeight: number,
     intellectualWeight: number,
-    sefirotPattern: SefirotWeights,
-    context?: { userMessage?: string; anubisResponse?: string }
+    stagePattern: StageWeights,
+    context?: { userMessage?: string; robResponse?: string }
   ): Memory {
     const memory: Memory = {
       id: `mem-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -350,9 +339,9 @@ export class MemorySystem {
       emotionalWeight,
       intellectualWeight,
       totalWeight: (emotionalWeight + intellectualWeight) / 2,
-      tier: 'river',
+      tier: 'working',
       weightBias: emotionalWeight > intellectualWeight ? 'eq' : emotionalWeight < intellectualWeight ? 'iq' : 'balanced',
-      sefirotPattern,
+      stagePattern,
       decayRate: 0.1,
       halfLife: 7, // days
       accessCount: 1,
@@ -360,21 +349,21 @@ export class MemorySystem {
       lastAccessed: new Date(),
       lastWeighted: new Date(),
       userMessage: context?.userMessage,
-      anubisResponse: context?.anubisResponse,
+      robResponse: context?.robResponse,
     };
     
-    // Weigh the memory
-    const weighing = this.weighMemory(memory);
+    // Assess importance
+    const assessment = this.assessImportance(memory);
     
     // Add to appropriate tier
     this.allMemories.set(memory.id, memory);
     
-    if (weighing.tier === 'golden') {
-      this.promoteToGolden(memory);
-    } else if (weighing.tier === 'library') {
-      this.promoteToLibrary(memory);
+    if (assessment.tier === 'core') {
+      this.promoteToCore(memory);
+    } else if (assessment.tier === 'longterm') {
+      this.promoteToLongTerm(memory);
     } else {
-      this.addToRiver(memory);
+      this.addToWorkingMemory(memory);
     }
     
     return memory;
@@ -388,18 +377,18 @@ export class MemorySystem {
     // Search all tiers
     const results: Memory[] = [];
     
-    // Check golden core first (most important)
-    for (const memory of this.goldenCore.memories) {
+    // Check core memory first (most important)
+    for (const memory of this.coreMemory.memories) {
       if (this.matchesQuery(memory, query)) {
         results.push(memory);
       }
     }
     
-    // Check library
-    results.push(...this.searchLibrary(query, limit - results.length));
+    // Check long-term memory
+    results.push(...this.searchLongTerm(query, limit - results.length));
     
-    // Check river
-    for (const slot of this.river.slots) {
+    // Check working memory
+    for (const slot of this.workingMemory.slots) {
       const memory = this.allMemories.get(slot.memoryId);
       if (memory && this.matchesQuery(memory, query) && !results.find(r => r.id === memory.id)) {
         results.push(memory);
@@ -433,7 +422,7 @@ export class MemorySystem {
     if (this.decayTimer) return;
     
     this.decayTimer = setInterval(() => {
-      this.updateRiverAges();
+      this.updateWorkingMemoryAges();
     }, this.DECAY_INTERVAL);
   }
 
@@ -444,17 +433,17 @@ export class MemorySystem {
     }
   }
 
-  private updateRiverAges(): void {
+  private updateWorkingMemoryAges(): void {
     const now = Date.now();
     
-    for (const slot of this.river.slots) {
+    for (const slot of this.workingMemory.slots) {
       slot.age = (now - slot.enteredAt.getTime()) / 1000;
       
       // Check for decay
-      if (slot.age > this.river.decayTime) {
-        const index = this.river.slots.indexOf(slot);
+      if (slot.age > this.workingMemory.decayTime) {
+        const index = this.workingMemory.slots.indexOf(slot);
         if (index !== -1) {
-          this.river.slots.splice(index, 1);
+          this.workingMemory.slots.splice(index, 1);
         }
       }
     }
@@ -465,9 +454,9 @@ export class MemorySystem {
   // ───────────────────────────────────────────────────────────────────────
 
   getStats(): {
-    riverCount: number;
-    libraryCount: number;
-    goldenCount: number;
+    workingCount: number;
+    longtermCount: number;
+    coreCount: number;
     totalCount: number;
     avgWeight: number;
     avgEmotionalWeight: number;
@@ -476,9 +465,9 @@ export class MemorySystem {
     const all = this.getAllMemories();
     
     return {
-      riverCount: this.river.slots.length,
-      libraryCount: this.library.memories.length,
-      goldenCount: this.goldenCore.memories.length,
+      workingCount: this.workingMemory.slots.length,
+      longtermCount: this.longTermMemory.memories.length,
+      coreCount: this.coreMemory.memories.length,
       totalCount: all.length,
       avgWeight: all.reduce((sum, m) => sum + m.totalWeight, 0) / all.length || 0,
       avgEmotionalWeight: all.reduce((sum, m) => sum + m.emotionalWeight, 0) / all.length || 0,
@@ -492,9 +481,9 @@ export class MemorySystem {
 
   serialize(): string {
     return JSON.stringify({
-      river: this.river,
-      library: this.library,
-      goldenCore: this.goldenCore,
+      workingMemory: this.workingMemory,
+      longTermMemory: this.longTermMemory,
+      coreMemory: this.coreMemory,
       allMemories: Array.from(this.allMemories.entries()),
     });
   }
@@ -503,9 +492,9 @@ export class MemorySystem {
     const system = new MemorySystem();
     const parsed = JSON.parse(data);
     
-    system.river = parsed.river;
-    system.library = parsed.library;
-    system.goldenCore = parsed.goldenCore;
+    system.workingMemory = parsed.workingMemory || parsed.river;
+    system.longTermMemory = parsed.longTermMemory || parsed.library;
+    system.coreMemory = parsed.coreMemory || parsed.goldenCore;
     system.allMemories = new Map(parsed.allMemories);
     
     return system;

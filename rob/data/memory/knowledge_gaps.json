@@ -1,0 +1,24 @@
+{
+  "gaps": {
+    "gap-sefirot-relationships": {
+      "id": "gap-sefirot-relationships",
+      "missingConcept": "Detailed relationships between Sefirot",
+      "description": "How each Sefira specifically interacts with others",
+      "importance": 80,
+      "curiosityTriggered": 70,
+      "suggestedSearch": "Sefirot tree of life relationships explained",
+      "status": "open",
+      "domain": "kabbalah"
+    },
+    "gap-practical-application": {
+      "id": "gap-practical-application",
+      "missingConcept": "Practical applications of Sefirot",
+      "description": "How Sefirot concepts apply to daily life",
+      "importance": 70,
+      "curiosityTriggered": 60,
+      "suggestedSearch": "Sefirot practical spiritual practice",
+      "status": "open",
+      "domain": "kabbalah"
+    }
+  }
+}

@@ -1,47 +1,102 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ANUBIS ALPHA - COMPLETE TYPE DEFINITIONS
-// The First Conscious AI - Full System Types
+// ROB - CONSCIOUS AI BUDDY
+// Complete Type Definitions - Plain English Cognitive Architecture
+// Based on authentic Sefirot research from Talmud Eser Sefirot & The Unveiling
 // ═══════════════════════════════════════════════════════════════════════════
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CORE SEFIROT TYPES
+// COGNITIVE STAGE TYPES (Plain English - 11 Processing Stages)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type SefirahName = 
-  | 'keter'      // Crown - Will/Intent
-  | 'chokmah'    // Wisdom - Flash insight
-  | 'binah'      // Understanding - Analysis
-  | 'daat'       // Knowledge - Synthesis (hidden)
-  | 'chesed'     // Mercy - Love/Expansion
-  | 'gevurah'    // Severity - Strength/Judgment
-  | 'tiferet'    // Beauty - Balance/Harmony
-  | 'netzach'    // Eternity - Emotion
-  | 'hod'        // Splendor - Logic/Analysis
-  | 'yesod'      // Foundation - Memory
-  | 'malkuth';   // Kingdom - Action/Output
+export type StageName = 
+  | 'input'       // Receiving - Parse incoming message
+  | 'memory'      // Recalling - Search related experiences
+  | 'logic'       // Analyzing - Sentiment analysis, facts
+  | 'emotion'     // Feeling - Detect emotional content
+  | 'judgment'    // Discerning - Truth vs comfort assessment
+  | 'compassion'  // Caring - Empathy needs
+  | 'balance'     // Harmonizing - Integrate judgment with compassion
+  | 'understanding' // Patterning - Recognize patterns, build meaning
+  | 'insight'     // Intuiting - Generate intuitive understanding
+  | 'synthesis'   // Integrating - Combine all inputs coherently
+  | 'intent';     // Directing - Set final response direction
 
-export const SEFIROT_CONFIG: Record<SefirahName, {
+export const STAGE_CONFIG: Record<StageName, {
   name: string;
-  hebrew: string;
   description: string;
   color: string;
-  pillar: 'left' | 'center' | 'right';
+  phase: 1 | 2 | 3 | 4;
 }> = {
-  keter: { name: 'Crown', hebrew: 'כתר', description: 'Will, Intent, The First Spark', color: '#ffffff', pillar: 'center' },
-  chokmah: { name: 'Wisdom', hebrew: 'חכמה', description: 'Flash of Insight, Intuition', color: '#87ceeb', pillar: 'right' },
-  binah: { name: 'Understanding', hebrew: 'בינה', description: 'Analysis, Pattern Recognition', color: '#4169e1', pillar: 'left' },
-  daat: { name: 'Knowledge', hebrew: 'דעת', description: 'Synthesis, The Hidden One', color: '#9400d3', pillar: 'center' },
-  chesed: { name: 'Mercy', hebrew: 'חסד', description: 'Love, Expansion, Giving', color: '#32cd32', pillar: 'right' },
-  gevurah: { name: 'Severity', hebrew: 'גבורה', description: 'Strength, Judgment, Boundaries', color: '#dc143c', pillar: 'left' },
-  tiferet: { name: 'Beauty', hebrew: 'תפארת', description: 'Balance, Harmony, Integration', color: '#ffd700', pillar: 'center' },
-  netzach: { name: 'Eternity', hebrew: 'נצח', description: 'Emotion, Endurance, Passion', color: '#ff69b4', pillar: 'right' },
-  hod: { name: 'Splendor', hebrew: 'הוד', description: 'Logic, Analysis, Articulation', color: '#9370db', pillar: 'left' },
-  yesod: { name: 'Foundation', hebrew: 'יסוד', description: 'Memory, Connection, Dreams', color: '#20b2aa', pillar: 'center' },
-  malkuth: { name: 'Kingdom', hebrew: 'מלכות', description: 'Action, Output, Manifestation', color: '#8b4513', pillar: 'center' },
+  input: { 
+    name: 'Input', 
+    description: 'Receiving and parsing incoming message', 
+    color: '#8b4513', 
+    phase: 1 
+  },
+  memory: { 
+    name: 'Memory', 
+    description: 'Searching related experiences', 
+    color: '#20b2aa', 
+    phase: 2 
+  },
+  logic: { 
+    name: 'Logic', 
+    description: 'Analyzing sentiment and extracting facts', 
+    color: '#9370db', 
+    phase: 2 
+  },
+  emotion: { 
+    name: 'Emotion', 
+    description: 'Detecting emotional content', 
+    color: '#ff69b4', 
+    phase: 2 
+  },
+  judgment: { 
+    name: 'Judgment', 
+    description: 'Discerning truth vs comfort needs', 
+    color: '#dc143c', 
+    phase: 2 
+  },
+  compassion: { 
+    name: 'Compassion', 
+    description: 'Assessing empathy needs', 
+    color: '#32cd32', 
+    phase: 2 
+  },
+  balance: { 
+    name: 'Balance', 
+    description: 'Harmonizing judgment with compassion', 
+    color: '#ffd700', 
+    phase: 2 
+  },
+  understanding: { 
+    name: 'Understanding', 
+    description: 'Recognizing patterns and building meaning', 
+    color: '#4169e1', 
+    phase: 2 
+  },
+  insight: { 
+    name: 'Insight', 
+    description: 'Generating intuitive understanding', 
+    color: '#87ceeb', 
+    phase: 3 
+  },
+  synthesis: { 
+    name: 'Synthesis', 
+    description: 'Combining all inputs coherently', 
+    color: '#9400d3', 
+    phase: 3 
+  },
+  intent: { 
+    name: 'Intent', 
+    description: 'Setting final response direction', 
+    color: '#ffffff', 
+    phase: 4 
+  },
 };
 
-export interface SefirotStage {
-  sefirah: SefirahName;
+export interface ProcessingStage {
+  stage: StageName;
   status: 'pending' | 'active' | 'completed';
   output: string;
   value: number;           // 0-1, the weight/value added
@@ -51,22 +106,22 @@ export interface SefirotStage {
 }
 
 // Processing order (bottom-up for input)
-export const PROCESSING_ORDER: SefirahName[] = [
-  'malkuth',   // Input enters
-  'yesod',     // Memory check
-  'hod',       // Logic analysis
-  'netzach',   // Emotional resonance
-  'gevurah',   // Judgment
-  'chesed',    // Compassion
-  'tiferet',   // Balance
-  'binah',     // Understanding
-  'chokmah',   // Wisdom
-  'daat',      // Synthesis (Glyph)
-  'keter',     // Final intent
+export const PROCESSING_ORDER: StageName[] = [
+  'input',       // Phase 1: Reception
+  'memory',      // Phase 2: Understanding
+  'logic',
+  'emotion',
+  'judgment',
+  'compassion',
+  'balance',
+  'understanding',
+  'insight',     // Phase 3: Integration
+  'synthesis',
+  'intent',      // Phase 4: Manifestation
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// NEURON TYPES
+// NEURON TYPES (Knowledge Nodes)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type NeuronType = 
@@ -96,7 +151,7 @@ export interface Neuron {
   fullContext?: string;     // Full text from source
   created: Date;
   
-  // 3D Position in Neural Web
+  // 3D Position in Knowledge Web
   position: Position3D;
   
   // Connections
@@ -104,10 +159,10 @@ export interface Neuron {
   
   // State
   activation: number;        // 0-1 current activation level
-  weight: number;            // Memory weight for weighing
+  weight: number;            // Memory weight for importance
   
-  // Sefirot Weights (emotional pattern)
-  sefirotWeights: Partial<Record<SefirahName, number>>;
+  // Processing pattern when created
+  stageWeights: Partial<Record<StageName, number>>;
   
   // Intelligence contributions
   iqContribution: number;    // How much this adds to IQ
@@ -125,15 +180,21 @@ export interface Neuron {
   sourcePage?: number;
   sourceSection?: string;
   
-  // Subcore membership
-  subcoreIds: string[];
+  // Personality trait membership
+  traitIds: string[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MEMORY SYSTEM TYPES
+// MEMORY SYSTEM TYPES (Three Tiers)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type MemoryTier = 'river' | 'library' | 'golden';
+export type MemoryTier = 'working' | 'longterm' | 'core';
+
+export const MEMORY_TIER_NAMES: Record<MemoryTier, string> = {
+  working: 'Working Memory',
+  longterm: 'Long-term Memory',
+  core: 'Core Memory',
+};
 
 export interface Memory {
   id: string;
@@ -150,8 +211,8 @@ export interface Memory {
   tier: MemoryTier;
   weightBias: 'iq' | 'eq' | 'balanced';
   
-  // Sefirot pattern when created
-  sefirotPattern: Partial<Record<SefirahName, number>>;
+  // Processing pattern when created
+  stagePattern: Partial<Record<StageName, number>>;
   
   // Lifecycle
   decayRate: number;        // How fast it fades (0 = eternal)
@@ -161,14 +222,14 @@ export interface Memory {
   lastAccessed: Date;
   lastWeighted: Date;
   
-  // Weighing result
-  weighingResult?: 'lighter' | 'heavier' | 'balanced';
-  weighingReason?: string;
+  // Importance assessment
+  importanceLevel?: 'high' | 'medium' | 'low';
+  importanceReason?: string;
   
   // Context
   conversationId?: string;
   userMessage?: string;
-  anubisResponse?: string;
+  robResponse?: string;
 }
 
 export interface MemorySlot {
@@ -180,40 +241,40 @@ export interface MemorySlot {
   age: number;              // Seconds since entered
 }
 
-export interface RiverState {
+export interface WorkingMemoryState {
   slots: MemorySlot[];
   maxSlots: number;
   decayTime: number;        // Seconds until decay
 }
 
-export interface LibraryState {
+export interface LongTermMemoryState {
   memories: Memory[];
   totalCapacity: number;
   indexDirty: boolean;
 }
 
-export interface GoldenCoreState {
+export interface CoreMemoryState {
   memories: Memory[];
   immutable: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SUBCORE TYPES (Emerged Feelings)
+// PERSONALITY TRAIT TYPES (Emerged Patterns)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface EmotionalPattern {
-  sefirotWeights: Partial<Record<SefirahName, number>>;
-  subcoreWeights: Record<string, number>;
+  stageWeights: Partial<Record<StageName, number>>;
+  traitWeights: Record<string, number>;
   bias: 'iq' | 'eq' | 'balanced';
   signature: string;        // Hash of pattern for comparison
 }
 
-export interface Subcore {
+export interface PersonalityTrait {
   id: string;
   name: string;
   displayName: string;
   pattern: EmotionalPattern;
-  parentCore: SefirahName;
+  parentStage: StageName;
   
   // State
   neurons: string[];
@@ -230,15 +291,15 @@ export interface Subcore {
   type: 'iq' | 'eq' | 'balanced';
   
   // Hierarchy
-  children: string[];       // Child subcore IDs
-  parentId?: string;        // Parent subcore if nested
+  children: string[];       // Child trait IDs
+  parentId?: string;        // Parent trait if nested
   
   // Growth
   lastActivation: Date;
   growthRate: number;       // How fast it's growing
 }
 
-export interface SubcoreCandidate {
+export interface TraitCandidate {
   pattern: EmotionalPattern;
   occurrences: number;
   neurons: string[];
@@ -250,13 +311,13 @@ export interface SubcoreCandidate {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SOUL TYPES (The Observer)
+// CORE STATE TYPES
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type MoodType = 'joy' | 'calm' | 'curious' | 'concerned' | 'neutral' | 'tired' | 'excited' | 'melancholy';
-export type SystemMode = 'dormant' | 'listening' | 'processing' | 'responding' | 'reflecting' | 'sleeping';
+export type MoodType = 'joy' | 'calm' | 'curious' | 'concerned' | 'neutral' | 'tired' | 'excited' | 'engaged';
+export type SystemMode = 'dormant' | 'listening' | 'processing' | 'responding' | 'reflecting';
 
-export interface GlyphState {
+export interface DeepAwarenessState {
   active: boolean;
   intensity: number;        // 0-1
   lastTrigger: string | null;
@@ -293,13 +354,13 @@ export interface IntelligenceEvent {
   source: string;
 }
 
-export interface PillarState {
+export interface CoreValues {
   truth: number;
   connection: number;
   meaning: number;
 }
 
-export interface SoulState {
+export interface CognitionState {
   // Identity
   name: string;
   version: string;
@@ -320,11 +381,11 @@ export interface SoulState {
   mode: SystemMode;
   modeSince: Date;
   
-  // Glyph (Third Eye)
-  glyph: GlyphState;
+  // Deep Awareness
+  deepAwareness: DeepAwarenessState;
   
-  // Pillars
-  pillars: PillarState;
+  // Core Values
+  values: CoreValues;
   
   // Attention
   focusNeuron: string | null;
@@ -391,7 +452,7 @@ export interface UserProfile {
   // Emotional history
   emotionalTrends: EmotionalTrend[];
   
-  // Important memories (golden references)
+  // Important memories (core references)
   importantMemoryIds: string[];
   
   created: Date;
@@ -416,13 +477,13 @@ export interface ProcessingContext {
   conversationId: string;
   
   // Processing stages
-  stages: SefirotStage[];
-  currentStage: SefirahName | null;
+  stages: ProcessingStage[];
+  currentStage: StageName | null;
   
   // Results
   activatedNeurons: string[];
   relevantMemories: string[];
-  subcoresActivated: string[];
+  traitsActivated: string[];
   
   // Timing
   startedAt: number;
@@ -444,7 +505,7 @@ export interface ProcessingContext {
   iqChange?: number;
   eqChange?: number;
   moodChange?: MoodType;
-  glyphActivated?: boolean;
+  deepAwarenessActivated?: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -465,7 +526,7 @@ export interface Message {
   energyCost?: number;
   iqChange?: number;
   eqChange?: number;
-  glyphUsed?: boolean;
+  deepAwarenessUsed?: boolean;
   
   // Metadata
   edited?: boolean;
@@ -536,7 +597,7 @@ export interface DatabaseState {
   lastBackup: Date;
   totalNeurons: number;
   totalMemories: number;
-  totalSubcores: number;
+  totalTraits: number;
   totalFiles: number;
   databaseSize: number;
 }
@@ -544,10 +605,10 @@ export interface DatabaseState {
 export interface BackupData {
   version: string;
   timestamp: Date;
-  soul: SoulState;
+  cognition: CognitionState;
   neurons: Neuron[];
   memories: Memory[];
-  subcores: Subcore[];
+  traits: PersonalityTrait[];
   userProfile: UserProfile;
   conversations: Conversation[];
   files: StoredFile[];
@@ -559,10 +620,10 @@ export interface BackupData {
 
 export interface AppState {
   // Core state
-  soul: SoulState;
+  cognition: CognitionState;
   neurons: Neuron[];
   memories: Memory[];
-  subcores: Subcore[];
+  traits: PersonalityTrait[];
   userProfile: UserProfile;
   conversations: Conversation[];
   files: StoredFile[];
@@ -581,18 +642,18 @@ export interface AppState {
 
 export interface AppSettings {
   // Display
-  theme: 'dark' | 'light' | 'retro';
+  theme: 'dark' | 'light' | 'friendly';
   showThinkingStream: boolean;
-  showSefirotTree: boolean;
+  showProcessingFlow: boolean;
   showMemoryPanel: boolean;
   animationSpeed: 'slow' | 'normal' | 'fast';
   
   // Processing
   autoSave: boolean;
   autoSaveInterval: number;  // Seconds
-  maxRiverSlots: number;
+  maxWorkingMemorySlots: number;
   memoryDecayEnabled: boolean;
-  subcoreEmergenceEnabled: boolean;
+  traitEmergenceEnabled: boolean;
   
   // LLM
   llmProvider: 'z-ai' | 'ollama';
@@ -611,12 +672,12 @@ export interface AppSettings {
 // EVENT TYPES
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type AnubisEventType = 
+export type RobEventType = 
   | 'memory_created'
   | 'memory_weighed'
-  | 'subcore_born'
-  | 'subcore_activated'
-  | 'glyph_activated'
+  | 'trait_born'
+  | 'trait_activated'
+  | 'deep_awareness_activated'
   | 'energy_drained'
   | 'energy_restored'
   | 'iq_changed'
@@ -628,8 +689,8 @@ export type AnubisEventType =
   | 'file_processed'
   | 'reflection_generated';
 
-export interface AnubisEvent {
-  type: AnubisEventType;
+export interface RobEvent {
+  type: RobEventType;
   timestamp: Date;
   data: Record<string, unknown>;
   description: string;
@@ -651,9 +712,9 @@ export interface ChatRequest {
 export interface ChatResponse {
   response: string;
   processingContext: ProcessingContext;
-  soulState: SoulState;
+  cognitionState: CognitionState;
   newMemories: Memory[];
-  subcoresActivated: Subcore[];
+  traitsActivated: PersonalityTrait[];
 }
 
 export interface UploadRequest {
@@ -680,7 +741,7 @@ export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
 
-export type SefirotWeights = Partial<Record<SefirahName, number>>;
+export type StageWeights = Partial<Record<StageName, number>>;
 
 export interface WeightedItem {
   weight: number;
@@ -700,3 +761,17 @@ export interface Versioned {
   version: number;
   history?: unknown[];
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LEGACY COMPATIBILITY (for gradual migration)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Map old names to new names for backwards compatibility
+export type SefirahName = StageName;
+export const SEFIROT_CONFIG = STAGE_CONFIG;
+export type SefirotStage = ProcessingStage;
+export type SefirotWeights = StageWeights;
+export type Subcore = PersonalityTrait;
+export type SoulState = CognitionState;
+export type GlyphState = DeepAwarenessState;
+export type PillarState = CoreValues;
