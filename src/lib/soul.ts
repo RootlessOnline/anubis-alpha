@@ -542,11 +542,13 @@ export class SoulEngine {
         }),
       });
 
+      const data = await response.json();
+      
       if (!response.ok) {
-        throw new Error('API request failed');
+        console.error('API error:', data);
+        return this.getFallbackResponse(context);
       }
 
-      const data = await response.json();
       return data.response || this.getFallbackResponse(context);
     } catch (error) {
       console.error('LLM response error:', error);

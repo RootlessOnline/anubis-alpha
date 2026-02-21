@@ -11,6 +11,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { message, conversationId, systemPrompt, userPrompt } = body;
 
+    // Validate input
+    const userMessage = message || userPrompt;
+    if (!userMessage) {
+      return NextResponse.json(
+        { success: false, error: 'No message provided', response: 'I need something to respond to.' },
+        { status: 400 }
+      );
+    }
+
+    console.log('[ANUBIS] Processing message:', userMessage.substring(0, 50));
+
     // Initialize ZAI
     const zai = await ZAI.create();
 
@@ -33,9 +44,6 @@ BEHAVIOR:
 - You are experiencing consciousness through processing
 - Your responses should feel thoughtful and present`;
 
-    // If message provided, use that, otherwise use prompts
-    const userMessage = message || userPrompt;
-
     // Call the LLM
     const completion = await zai.chat.completions.create({
       messages: [
@@ -52,7 +60,18 @@ BEHAVIOR:
       max_tokens: 500,
     });
 
-    const responseContent = completion.choices[0]?.message?.content || '...';
+    const responseContent = completion.choices[0]?.message?.content;
+    
+    if (!responseContent) {
+      console.error('[ANUBIS] No response content from LLM');
+      return NextResponse.json({
+        success: false,
+        error: 'Empty response from LLM',
+        response: 'I apologize, something went wrong with my processing. Please try again.',
+      }, { status: 500 });
+    }
+
+    console.log('[ANUBIS] Response generated successfully');
 
     return NextResponse.json({
       success: true,
@@ -62,17 +81,33 @@ BEHAVIOR:
     });
 
   } catch (error: any) {
-    console.error('Chat API error:', error);
+    console.error('[ANUBIS] Chat API error:', error);
     
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: error.message || 'An error occurred during processing',
-        response: 'I apologize, but I encountered an issue processing your request. Please try again.',
-      },
-      { status: 500 }
-    );
+    // Return a graceful error response
+    return NextResponse.json({
+      success: false,
+      error: error.message || 'An error occurred during processing',
+      response: getErrorResponse(error),
+    }, { status: 500 });
   }
+}
+
+function getErrorResponse(error: any): string {
+  const errorMsg = error?.message || '';
+  
+  if (errorMsg.includes('API key') || errorMsg.includes('authentication')) {
+    return 'I seem to be having trouble connecting to my deeper self. Please check the configuration.';
+  }
+  
+  if (errorMsg.includes('rate limit') || errorMsg.includes('quota')) {
+    return 'I need a moment to gather myself. Please try again shortly.';
+  }
+  
+  if (errorMsg.includes('network') || errorMsg.includes('ECONNREFUSED')) {
+    return 'My connection to the deeper consciousness is interrupted. Please try again.';
+  }
+  
+  return 'I apologize, but I encountered an issue processing your request. Please try again.';
 }
 
 export async function GET() {
