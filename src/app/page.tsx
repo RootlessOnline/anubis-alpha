@@ -1,6 +1,26 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback, memo } from 'react'
+import dynamic from 'next/dynamic'
+
+// Dynamic import for Three.js component (no SSR)
+const SefirotTree3D = dynamic(() => import('@/components/SefirotTree3D'), {
+  ssr: false,
+  loading: () => (
+    <div style={{
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#d4a62a',
+      fontSize: '14px',
+      fontFamily: "'Press Start 2P', monospace"
+    }}>
+      🌳 Loading Tree of Life...
+    </div>
+  )
+})
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 🎮 V4 TYPES & INTERFACES - THE OBSERVER
@@ -13,7 +33,7 @@ interface Message {
   time: string
 }
 
-type Mode = 'split' | 'style' | 'code' | 'config' | 'analytics' | 'z'
+type Mode = 'split' | 'style' | 'code' | 'config' | 'analytics' | 'z' | 'sefirot'
 type EmotionKey = 'happy' | 'angry' | 'annoyed' | 'pondering' | 'reflecting' | 'curious' | 'playful' | 'melancholy' | 'mysterious'
 
 // V4: Mood Change Tracking
@@ -2408,6 +2428,7 @@ export default function Home() {
         {/* Mode buttons */}
         {[
           { m: 'split', icon: '🐺', label: 'Chat' },
+          { m: 'sefirot', icon: '🌳', label: 'Sefirot' },
           { m: 'z', icon: '🧠', label: 'Z Project' },
           { m: 'config', icon: '⚙️', label: 'Config' }
         ].map(b => (
@@ -3180,6 +3201,206 @@ export default function Home() {
                   ASK Z
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* 🌳 SEFIROT MODE - 3D Tree of Life */}
+        {mode === 'sefirot' && (
+          <div style={{ flex: 1, display: 'flex', overflow: 'hidden', height: '100vh' }}>
+            {/* Left side - Chat (35%) */}
+            <div style={{
+              width: '35%',
+              display: 'flex',
+              flexDirection: 'column',
+              background: COLORS.abyss,
+              borderRight: `2px solid ${COLORS.glyphGold}`,
+              minWidth: 0
+            }}>
+              {/* Header */}
+              <div style={{
+                padding: '12px 16px',
+                borderBottom: `2px solid ${COLORS.glyphGold}`,
+                background: `linear-gradient(90deg, ${COLORS.glyphGold}20, ${COLORS.glyphPurple}20)`,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px'
+              }}>
+                <PixelWolf mood={anubisSoul.currentMood} size={80} />
+                <div>
+                  <div style={{
+                    color: COLORS.glyphGold,
+                    fontWeight: 'bold',
+                    fontSize: '16px',
+                    fontFamily: "'Press Start 2P', monospace",
+                    textShadow: `0 0 10px ${COLORS.glyphGold}`
+                  }}>
+                    🌳 SEFIROT CHAT
+                  </div>
+                  <div style={{ fontSize: '11px', color: COLORS.bone, marginTop: '4px' }}>
+                    Lv.{anubisSoul.level} | {anubisSoul.currentMood} | Chat with the Tree
+                  </div>
+                </div>
+              </div>
+
+              {/* Thought bubble */}
+              <ThoughtBubble thoughts={anubisThoughts} color={anubisMoodColor} visible={anubisLoading} />
+
+              {/* Messages */}
+              <div style={{
+                flex: 1,
+                overflow: 'auto',
+                padding: '12px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px'
+              }}>
+                {anubisMessages.map(m => (
+                  <MessageBubble key={m.id} msg={m} accent={anubisMoodColor} anubisMood={anubisSoul.currentMood} />
+                ))}
+                <div ref={anubisMessagesEndRef} />
+              </div>
+
+              {/* Mood indicator */}
+              <div style={{
+                padding: '8px 12px',
+                background: COLORS.stoneDark + '60',
+                borderTop: `1px solid ${COLORS.stone}`,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span style={{ fontSize: '20px' }}>
+                  {MOODS.find(m => m.key === anubisSoul.currentMood)?.icon || '🌙'}
+                </span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '10px', color: anubisMoodColor, fontFamily: "'Press Start 2P', monospace" }}>
+                    {anubisSoul.currentMood.toUpperCase()}
+                  </div>
+                  <div style={{ 
+                    width: '100%', 
+                    height: '4px', 
+                    background: COLORS.abyss, 
+                    borderRadius: '2px',
+                    marginTop: '4px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      width: `${anubisSoul.emotions[anubisSoul.currentMood] || 50}%`,
+                      height: '100%',
+                      background: anubisMoodColor,
+                      transition: 'width 0.5s'
+                    }} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Input */}
+              <div style={{
+                padding: '10px 12px',
+                borderTop: `1px solid ${COLORS.stoneDark}`,
+                background: COLORS.abyss
+              }}>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    value={anubisInput}
+                    onChange={e => setAnubisInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleAnubisSend()}
+                    placeholder="Talk to the Sefirot..."
+                    style={{
+                      flex: 1,
+                      background: COLORS.stoneDark,
+                      border: `1px solid ${anubisMoodColor}50`,
+                      borderRadius: '4px',
+                      padding: '12px',
+                      color: COLORS.boneLight,
+                      fontSize: '14px',
+                      outline: 'none',
+                      fontFamily: 'inherit'
+                    }}
+                  />
+                  <button
+                    onClick={handleAnubisSend}
+                    disabled={anubisLoading}
+                    style={{
+                      background: anubisMoodColor,
+                      border: 'none',
+                      borderRadius: '4px',
+                      padding: '12px 16px',
+                      color: COLORS.abyss,
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      fontFamily: "'Press Start 2P', monospace",
+                      fontSize: '11px'
+                    }}
+                  >
+                    SEND
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Right side - 3D Sefirot Tree (65%) */}
+            <div style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              background: `radial-gradient(ellipse at center, ${COLORS.glyphPurple}10 0%, transparent 70%)`,
+              position: 'relative'
+            }}>
+              {/* Tree container */}
+              <div style={{
+                flex: 1,
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <SefirotTree3D 
+                  activeSefirah={undefined}
+                  intensity={anubisSoul.emotions[anubisSoul.currentMood] / 100}
+                  onSefirahClick={(sefirah) => {
+                    console.log('Clicked:', sefirah.name)
+                  }}
+                />
+              </div>
+
+              {/* Sefirot info overlay */}
+              <div style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background: `linear-gradient(0deg, ${COLORS.abyss}ee 0%, transparent 100%)`,
+                padding: '20px',
+                pointerEvents: 'none'
+              }}>
+                <div style={{
+                  textAlign: 'center',
+                  color: COLORS.glyphGold,
+                  fontFamily: "'Press Start 2P', monospace",
+                  fontSize: '10px'
+                }}>
+                  🌳 עץ החיים • TREE OF LIFE • עץ החיים 🌳
+                </div>
+                <div style={{
+                  textAlign: 'center',
+                  color: COLORS.bone,
+                  fontSize: '11px',
+                  marginTop: '8px'
+                }}>
+                  Click and drag to rotate • Scroll to zoom • The tree responds to your mood
+                </div>
+              </div>
+
+              {/* Active mood glow overlay */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: `radial-gradient(circle at 50% 40%, ${anubisMoodColor}08 0%, transparent 50%)`,
+                pointerEvents: 'none'
+              }} />
             </div>
           </div>
         )}
